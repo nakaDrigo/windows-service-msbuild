@@ -4,72 +4,55 @@
     <!-- These settings control what the service's name, description etc appear in services.msc task panel. -->
     <Choose>
         <When Condition="'$(ServiceDisplayName)' == ''">
-            <When Condition="'$(ServiceDescription)' == ''">
-                <PropertyGroup Label="ServiceMetaData">
-                    <ServiceName>$(ServiceName)</ServiceName>
-                    <ServiceDisplayName>$(ServiceName)</ServiceDisplayName>
-                    <ServiceDescription>$(ServiceName)</ServiceDescription>
-                </PropertyGroup>
-            </When>
-            <Otherwise>
-                <PropertyGroup Label="ServiceMetaData">
-                    <ServiceName>$(ServiceName)</ServiceName>
-                    <ServiceDisplayName>$(ServiceName)</ServiceDisplayName>
-                    <ServiceDescription>$(ServiceDescription)</ServiceDescription>
-                </PropertyGroup>
-            </Otherwise>
+            <PropertyGroup Label="ServiceMetaData" Condition="'$(ServiceDescription)' == ''">
+                <ServiceName>$(ServiceName)</ServiceName>
+                <ServiceDisplayName>$(ServiceName)</ServiceDisplayName>
+                <ServiceDescription>$(ServiceName)</ServiceDescription>
+            </PropertyGroup>
+            <PropertyGroup Label="ServiceMetaData" Condition="'$(ServiceDescription)' != ''">
+                <ServiceName>$(ServiceName)</ServiceName>
+                <ServiceDisplayName>$(ServiceName)</ServiceDisplayName>
+                <ServiceDescription>$(ServiceDescription)</ServiceDescription>
+            </PropertyGroup>
         </When>
         <Otherwise>
-            <When Condition="'$(ServiceDescription)' == ''">
-                <PropertyGroup Label="ServiceMetaData">
-                    <ServiceName>$(ServiceName)</ServiceName>
-                    <ServiceDisplayName>$(ServiceDisplayName)</ServiceDisplayName>
-                    <ServiceDescription>$(ServiceDisplayName)</ServiceDescription>
-                </PropertyGroup>
-            </When>
-            <Otherwise>
-                <PropertyGroup Label="ServiceMetaData">
-                    <ServiceName>$(ServiceName)</ServiceName>
-                    <ServiceDisplayName>$(ServiceDisplayName)</ServiceDisplayName>
-                    <ServiceDescription>$(ServiceDescription)</ServiceDescription>
-                </PropertyGroup>
-            </Otherwise>
+            <PropertyGroup Label="ServiceMetaData" Condition="'$(ServiceDescription)' == ''">
+                <ServiceName>$(ServiceName)</ServiceName>
+                <ServiceDisplayName>$(ServiceDisplayName)</ServiceDisplayName>
+                <ServiceDescription>$(ServiceDisplayName)</ServiceDescription>
+            </PropertyGroup>
+            <PropertyGroup Label="ServiceMetaData" Condition="'$(ServiceDescription)' != ''">
+                <ServiceName>$(ServiceName)</ServiceName>
+                <ServiceDisplayName>$(ServiceDisplayName)</ServiceDisplayName>
+                <ServiceDescription>$(ServiceDescription)</ServiceDescription>
+            </PropertyGroup>
         </Otherwise>
     </Choose>
 
     <Choose>
         <When Condition="'$(DeploymentServerName)' == ''">
-            <When Condition="'$(DeploymentDrive)' == ''">
-                <!-- You can choose any path here. For convenience, I'm using C: -->
-                <PropertyGroup>
-                    <DeploymentFolder>C:\$(ServiceName)\</DeploymentFolder>
-                </PropertyGroup>
-            </When>
-            <Otherwise>
-                <PropertyGroup>
-                    <DeploymentFolder>$(DeploymentDrive):\$(ServiceName)\</DeploymentFolder>
-                </PropertyGroup>
-            </Otherwise>
+            <!-- You can choose any path here. For convenience, I'm using C: -->
+            <PropertyGroup Condition="'$(DeploymentDrive)' == ''">
+                <DeploymentFolder>C:\$(ServiceName)\</DeploymentFolder>
+            </PropertyGroup>
+            <PropertyGroup Condition="'$(DeploymentDrive)' == ''">
+                <DeploymentFolder>$(DeploymentDrive):\$(ServiceName)\</DeploymentFolder>
+            </PropertyGroup>
         </When>
         <!-- should be in \\serverName format-->
         <Otherwise>
-            <When Condition="'$(DeploymentDrive)' == ''">
-                <PropertyGroup>
-                    <DeploymentServer Condition="'$(DeploymentServerName)' != ''">$(DeploymentServerName)</DeploymentServer>
-                    <DeploymentFolder>$(DeploymentServer)\C$\$(ServiceName)</DeploymentFolder>
-                    <!-- 4:5:4 => Planned: Application: Upgrade. For more reason codes, run "sc stop" -->
-                    <DeploymentReason>4:5:4</DeploymentReason>
-                </PropertyGroup>
-            </When>
-            <Otherwise>
-                <PropertyGroup>
-                    <DeploymentServer Condition="'$(DeploymentServerName)' != ''">$(DeploymentServerName)</DeploymentServer>
-                    <DeploymentFolder>$(DeploymentServer)\$(DeploymentDrive)$\$(ServiceName)</DeploymentFolder>
-                    <!-- 4:5:4 => Planned: Application: Upgrade. For more reason codes, run "sc stop" -->
-                    <DeploymentReason>4:5:4</DeploymentReason>
-                </PropertyGroup>
-            </Otherwise>
-
+            <PropertyGroup Condition="'$(DeploymentDrive)' == ''">
+                <DeploymentServer Condition="'$(DeploymentServerName)' != ''">$(DeploymentServerName)</DeploymentServer>
+                <DeploymentFolder>$(DeploymentServer)\C$\$(ServiceName)</DeploymentFolder>
+                <!-- 4:5:4 => Planned: Application: Upgrade. For more reason codes, run "sc stop" -->
+                <DeploymentReason>4:5:4</DeploymentReason>
+            </PropertyGroup>
+            <PropertyGroup Condition="'$(DeploymentDrive)' != ''">
+                <DeploymentServer Condition="'$(DeploymentServerName)' != ''">$(DeploymentServerName)</DeploymentServer>
+                <DeploymentFolder>$(DeploymentServer)\$(DeploymentDrive)$\$(ServiceName)</DeploymentFolder>
+                <!-- 4:5:4 => Planned: Application: Upgrade. For more reason codes, run "sc stop" -->
+                <DeploymentReason>4:5:4</DeploymentReason>
+            </PropertyGroup>
         </Otherwise>
     </Choose>
 

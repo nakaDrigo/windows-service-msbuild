@@ -32,24 +32,24 @@
     <Choose>
         <When Condition="'$(DeploymentServerName)' == ''">
             <!-- You can choose any path here. For convenience, I'm using C: -->
-            <PropertyGroup Condition="'$(DeploymentDrive)' == ''">
+            <PropertyGroup Condition="'$(DeploymentFolder)' == ''">
                 <DeploymentFolder>C:\$(ServiceName)\</DeploymentFolder>
             </PropertyGroup>
-            <PropertyGroup Condition="'$(DeploymentDrive)' == ''">
-                <DeploymentFolder>$(DeploymentDrive):\$(ServiceName)\</DeploymentFolder>
+            <PropertyGroup Condition="'$(DeploymentFolder)' != ''">
+                <DeploymentFolder>$(DeploymentFolder)</DeploymentFolder>
             </PropertyGroup>
         </When>
         <!-- should be in \\serverName format-->
         <Otherwise>
-            <PropertyGroup Condition="'$(DeploymentDrive)' == ''">
-                <DeploymentServer Condition="'$(DeploymentServerName)' != ''">$(DeploymentServerName)</DeploymentServer>
+            <PropertyGroup Condition="'$(DeploymentFolder)' == ''">
+                <DeploymentServer>$(DeploymentServerName)</DeploymentServer>
                 <DeploymentFolder>$(DeploymentServer)\C$\$(ServiceName)</DeploymentFolder>
                 <!-- 4:5:4 => Planned: Application: Upgrade. For more reason codes, run "sc stop" -->
                 <DeploymentReason>4:5:4</DeploymentReason>
             </PropertyGroup>
-            <PropertyGroup Condition="'$(DeploymentDrive)' != ''">
-                <DeploymentServer Condition="'$(DeploymentServerName)' != ''">$(DeploymentServerName)</DeploymentServer>
-                <DeploymentFolder>$(DeploymentServer)\$(DeploymentDrive)$\$(ServiceName)</DeploymentFolder>
+            <PropertyGroup Condition="'$(DeploymentFolder)' != ''">
+                <DeploymentServer>$(DeploymentServerName)</DeploymentServer>
+                <DeploymentFolder>$(DeploymentFolder)</DeploymentFolder>
                 <!-- 4:5:4 => Planned: Application: Upgrade. For more reason codes, run "sc stop" -->
                 <DeploymentReason>4:5:4</DeploymentReason>
             </PropertyGroup>
@@ -58,8 +58,8 @@
 
     <PropertyGroup>
         <ProjectName>$(ServiceName)</ProjectName>
-        <ProjectFile>$(MSBuildProjectDirectory)\$(ProjectName).csproj</ProjectFile>
-        <ServiceExecutablePath>$(DeploymentDrive):\$(ServiceName)\$(ProjectName).exe</ServiceExecutablePath>
+        <ProjectFile>$(ProjectFile)</ProjectFile>
+        <ServiceExecutableFile>$(DeploymentFolder)\$(ServiceExecutableFile</ServiceExecutableFile>
     </PropertyGroup>
 
     <Target Name="DeployService">
@@ -67,7 +67,7 @@
         <Exec Command="safeServiceStop $(ServiceName) $(DeploymentServer) $(DeploymentReason)" />
 
         <Exec Command="safeServiceDelete $(ServiceName) $(DeploymentServer)" ContinueOnError="true" />
-        <Exec Command="sc $(DeploymentServer) create $(ServiceName) binPath= &quot;$(ServiceExecutablePath)&quot; start= delayed-auto displayName= &quot;$(ServiceDisplayName)&quot;" />
+        <Exec Command="sc $(DeploymentServer) create $(ServiceName) binPath= &quot;$(ServiceExecutableFile)&quot; start= delayed-auto displayName= &quot;$(ServiceDisplayName)&quot;" />
         <Exec Command="sc $(DeploymentServer) description $(ServiceName) &quot;$(ServiceDescription)&quot;" />
         <Exec Command="safeServiceStart $(ServiceName) $(DeploymentServer) " ContinueOnError="true" />
     </Target>
